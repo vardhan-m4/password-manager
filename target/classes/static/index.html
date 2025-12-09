@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Password Manager</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        accent: '#4f46e5',
+                        muted: '#6b7280'
+                    },
+                    borderRadius: {
+                        'xl-2': '1rem'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900">
+    <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+
+        <!-- Header -->
+        <header class="mb-8 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="p-2 rounded-lg bg-accent text-white">
+                    <!-- lock icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M12 11c.5 0 1 .4 1 1v3a1 1 0 01-2 0v-3c0-.6.4-1 1-1z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                            d="M12 2a7 7 0 017 7v3a7 7 0 01-7 7 7 7 0 01-7-7V9a7 7 0 017-7z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Password Manager</h1>
+                    <p class="mt-1 text-sm text-muted">Secure · Local AES-encrypted vault</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button id="exportBtn"
+                    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm">
+                    <!-- download icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 3v12m0 0l4-4m-4 4l-4-4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7" />
+                    </svg>
+                    Export
+                </button>
+                <button id="importBtn"
+                    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm">
+                    <!-- upload icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M3 15a4 4 0 004 4h10a4 4 0 004-4M12 3v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                    Import
+                </button>
+                <input id="importFile" type="file" accept=".json" class="hidden" />
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left column: Form -->
+            <section class="lg:col-span-2">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Master Password</label>
+                    <input id="master" type="password" placeholder="Enter master password"
+                        class="w-full rounded-lg px-4 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent mb-4" />
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-slate-600 mb-1">Site</label>
+                            <input id="site" placeholder="e.g. github.com"
+                                class="w-full rounded-lg px-4 py-2 border border-slate-200 focus:outline-none" />
+                        </div>
+                        <div>
+                            <label class="block text-sm text-slate-600 mb-1">Username (optional)</label>
+                            <input id="username" placeholder="username or email"
+                                class="w-full rounded-lg px-4 py-2 border border-slate-200 focus:outline-none" />
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="block text-sm text-slate-600 mb-1">Password to store</label>
+                        <div class="flex gap-2">
+                            <input id="password" placeholder="Password to store"
+                                class="flex-1 rounded-lg px-4 py-2 border border-slate-200 focus:outline-none" />
+                            <button id="addBtn"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white font-semibold hover:bg-indigo-600">
+                                <!-- plus icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap items-center gap-3">
+                        <input id="searchSite" placeholder="Site to retrieve (exact)"
+                            class="rounded-lg px-3 py-2 border border-slate-200 focus:outline-none w-64" />
+                        <button id="retrieveBtn"
+                            class="px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-2">
+                            <!-- search icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                    d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+                            </svg>
+                            Retrieve
+                        </button>
+                        <button id="listBtn"
+                            class="px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 inline-flex items-center gap-2">
+                            <!-- list icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                    d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                            </svg>
+                            List All
+                        </button>
+                        <button id="clearBtn" class="ml-auto text-sm text-muted hover:underline">Clear output</button>
+                    </div>
+                </div>
+
+                <!-- Output -->
+                <div class="mt-5">
+                    <div id="output"
+                        class="whitespace-pre-wrap bg-slate-900 text-slate-100 rounded-lg p-4 min-h-[120px]"></div>
+                </div>
+            </section>
+
+            <!-- Right column: Tips / list / actions -->
+            <aside class="space-y-4">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <h3 class="text-sm font-medium">Tips</h3>
+                    <ul class="mt-2 text-sm text-muted space-y-2">
+                        <li>Use a strong master password you can remember.</li>
+                        <li>Master password is <strong>not</strong> stored — losing it means you'll lose access.</li>
+                        <li>Passwords stored locally in <code>passwords.json</code>.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <h3 class="text-sm font-medium">Quick actions</h3>
+                    <div class="mt-3 grid gap-2">
+                        <button id="copyAllBtn"
+                            class="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 inline-flex items-center justify-center gap-2">
+                            <!-- clipboard list icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M9 12h6M9 16h6M9 8h6M9 20h6a2 2 0 002-2V8a2 2 0 00-2-2h-3l-1-2H9l-1 2H5a2 2 0 00-2 2v10a2 2 0 002 2h4z" />
+                            </svg>
+                            Copy list to clipboard
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-root" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

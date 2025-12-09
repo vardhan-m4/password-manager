@@ -1,0 +1,6 @@
+com\example\passwordmanager\PasswordRepository.class
+com\example\passwordmanager\PasswordEntry.class
+com\example\passwordmanager\PasswordRepository$1.class
+com\example\passwordmanager\Application.class
+com\example\passwordmanager\CryptoUtils.class
+com\example\passwordmanager\PasswordController.class
